@@ -2,15 +2,16 @@ import requests
 import json
 import sys, getopt
 
-def getUrl(competition,year,eventNum,pageNum):
-    return "https://games.crossfit.com/competitions/api/v1/competitions/" + competition + "/" + str(year) + "/leaderboards?&sort=" + str(eventNum) + "&page=" + str(pageNum)
+def getUrl(competition,year,division,eventNum,pageNum):
+    return "https://games.crossfit.com/competitions/api/v1/competitions/" + competition + "/" + str(year) + "/leaderboards" \
+           + "?&sort=" + str(eventNum) + "&page=" + str(pageNum) + "&division=" + str(division)
 
-def getData(competition,year,eventNum):
+def getData(competition,year,division,eventNum,pages):
     allData = []
-    data = json.loads(requests.get(getUrl(competition,year,eventNum,1)).text)
-    pageTotal = data["pagination"]["totalPages"]
-    for i in range(1,3): # for now, just pages 1 and 2. fix with int(pageTotal+1)
-        page = json.loads(requests.get(getUrl(competition,year,eventNum,i)).text)
+    for i in range(1,pages+1):
+        if i % 10 == 0:
+            print 'page ',i
+        page = json.loads(requests.get(getUrl(competition,year,division,eventNum,i)).text)
         leaderboardRows = page["leaderboardRows"]
         for row in leaderboardRows:
             rowData = {}
@@ -24,16 +25,18 @@ def main(argv):
     comp = ''
     year = ''
     eventnum = 0
+    pages = 1
+    division = 1
     try:
-        opts, args = getopt.getopt(argv,"hc:y:e:",["comp=","year=","eventnum="])
+        opts, args = getopt.getopt(argv,"hp:c:y:e:d:",["pages=","comp=","year=","eventnum=","division="])
     except getopt.GetoptError:
-        print 'getData.py -c <competition> -y <year> optional: -e <event num>'
+        print 'getData.py -c <competition> -y <year> -d <division> optional: -e <event num> -p <pages>'
         sys.exit(2)
     optList = []
     for opt, arg in opts:
         optList.append(opt)
         if opt == '-h':
-            print 'getData.py -c <competition> -y <year> optional: -e <event num>'
+            print 'getData.py -c <competition> -y <year> -d <division> optional: -e <event num> -p <pages>'
             sys.exit()
         elif opt in ("-c", "--comp"):
             if arg not in ["open","regionals","games"]:
@@ -44,11 +47,21 @@ def main(argv):
             year = arg
         elif opt in ("-e", "--eventnum"):
             eventnum = arg
+        elif opt in ("-p", "--pages"):
+            pages = arg
+        elif opt in ("-d", "--division"):
+            if int(arg) not in range(1,20):
+                print "invalid division (1-19). 1: Men, 2: Women"
+                sys.exit(2)
+            division = arg
     if '-c' not in optList:
         print '-c <competition> is a required option'
         sys.exit(2)
     if '-y' not in optList:
         print '-y <year> is a required option'
+        sys.exit(2)
+    if '-d' not in optList:
+        print '-d <division> is a required option (1-19) 1: Men, 2: Women'
         sys.exit(2)
     if comp == "open" and int(year) < 2017 or int(year) > 2020:
         print 'invalid year for the open (valid for 2017-2020)'
@@ -61,7 +74,7 @@ def main(argv):
         sys.exit(2)
 
     dataFile = open(str(comp)+"_"+str(year)+".json","w")
-    data = getData(str(comp),year,int(eventnum))
+    data = {"data" : getData(str(comp),year,int(division),int(eventnum),int(pages))}
     dataFile.write(str(data))
     dataFile.close()
 
