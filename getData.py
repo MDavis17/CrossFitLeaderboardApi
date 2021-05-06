@@ -31,6 +31,7 @@ def main(argv):
     eventnum = 0
     pages = 1
     division = 1
+    divisions = ["men","women"]
     try:
         opts, args = getopt.getopt(argv,"hp:c:y:e:d:",["pages=","comp=","year=","eventnum=","division="])
     except getopt.GetoptError:
@@ -50,14 +51,14 @@ def main(argv):
         elif opt in ("-y", "--year"):
             year = arg
         elif opt in ("-e", "--eventnum"):
-            eventnum = arg
+            eventnum = int(arg)
         elif opt in ("-p", "--pages"):
-            pages = arg
+            pages = int(arg)
         elif opt in ("-d", "--division"):
             if int(arg) not in range(1,20):
                 print "invalid division (1-19). 1: Men, 2: Women"
                 sys.exit(2)
-            division = arg
+            division = int(arg)
     if '-c' not in optList:
         print '-c <competition> is a required option'
         sys.exit(2)
@@ -77,8 +78,9 @@ def main(argv):
         print 'invalid year for the open (valid for 2007-2020)'
         sys.exit(2)
 
-    dataFile = open(str(comp)+"_"+str(year)+".json","w")
-    data = {"data": getData(str(comp),year,int(division),int(eventnum),int(pages))}
+
+    dataFile = open(str(comp)+"_"+str(year)+"_"+divisions[division-1]+".json","w")
+    data = {"data": getData(str(comp),year,division,eventnum,pages)}
     dataFile.write(str(data))
     dataFile.close()
 
