@@ -35,13 +35,13 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hp:c:y:e:d:",["pages=","comp=","year=","eventnum=","division="])
     except getopt.GetoptError:
-        print 'getData.py -c <competition> -y <year> -d <division> optional: -e <event num> -p <pages>'
+        print 'getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>'
         sys.exit(2)
     optList = []
     for opt, arg in opts:
         optList.append(opt)
         if opt == '-h':
-            print 'getData.py -c <competition> -y <year> -d <division> optional: -e <event num> -p <pages>'
+            print 'getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>'
             sys.exit()
         elif opt in ("-c", "--comp"):
             if arg not in ["open","regionals","games"]:

@@ -1,0 +1,38 @@
+*******************
+Running CrossFit Leaderboard API
+*******************
+
+Basic Python:
+
+run command: 'python getData.py <options>'
+
+*tested in development with python 2.7
+
+*******************
+
+Options:
+
+*required
+-c, --comp <competition>
+Must be one of [open, regionals, games]
+
+-y, --year <year>
+
+Note: there may be holes in database for some years and competitions.
+
+*optional
+
+-d, --division <division>
+Must be number between 1-19 (inclusive)
+1 is Men, 2 is Women. Others are age group divisions. Default is 1.
+
+-e, --eventnum <event number>
+Specifies which workout to sort results with. Currently no validation on allowed values.
+Default is 0 (overall rank).
+
+-p, --pages <pages>
+Specifies how many pages of data to include in output. Each page of data holds 50
+athletes. Default is 1.
+
+
+*******************
