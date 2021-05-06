@@ -1,6 +1,7 @@
 import requests
 import json
 import sys, getopt
+import unicodedata
 
 def getUrl(competition,year,division,eventNum,pageNum):
     return "https://games.crossfit.com/competitions/api/v1/competitions/" + competition + "/" + str(year) + "/leaderboards" \
@@ -15,9 +16,12 @@ def getData(competition,year,division,eventNum,pages):
         leaderboardRows = page["leaderboardRows"]
         for row in leaderboardRows:
             rowData = {}
-            rowData["entrant"] = row["entrant"]
-            rowData["overallRank"] = row["overallRank"]
-            rowData["overallScore"] = row["overallScore"]
+            entrantData = {}
+            for key in row["entrant"]:
+                entrantData[str(key)] = str(unicodedata.normalize('NFKD', row["entrant"][key]).encode('ascii', 'ignore'))
+            rowData["entrant"] = entrantData
+            rowData["overallRank"] = str(row["overallRank"])
+            rowData["overallScore"] = str(row["overallScore"])
             allData.append(rowData)
     return allData
 
@@ -74,7 +78,7 @@ def main(argv):
         sys.exit(2)
 
     dataFile = open(str(comp)+"_"+str(year)+".json","w")
-    data = {"data" : getData(str(comp),year,int(division),int(eventnum),int(pages))}
+    data = {"data": getData(str(comp),year,int(division),int(eventnum),int(pages))}
     dataFile.write(str(data))
     dataFile.close()
 
