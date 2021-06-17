@@ -9,9 +9,9 @@ def getUrl(competition,year,division,eventNum,pageNum):
 
 def getData(competition,year,division,eventNum,pages):
     allData = []
-    for i in range(1,pages+1):
+    for i in range(1,int(pages)+1):
         if i % 10 == 0:
-            print 'page ',i
+            print('page ',i)
         page = json.loads(requests.get(getUrl(competition,year,division,eventNum,i)).text)
         leaderboardRows = page["leaderboardRows"]
         for row in leaderboardRows:
@@ -25,6 +25,7 @@ def getData(competition,year,division,eventNum,pages):
             allData.append(rowData)
     return allData
 
+# TODO: refactor CLI to run in different script
 def main(argv):
     comp = ''
     year = ''
@@ -35,17 +36,17 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hp:c:y:e:d:",["pages=","comp=","year=","eventnum=","division="])
     except getopt.GetoptError:
-        print 'getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>'
+        print('getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>')
         sys.exit(2)
     optList = []
     for opt, arg in opts:
         optList.append(opt)
         if opt == '-h':
-            print 'getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>'
+            print('getData.py -c <competition> -y <year> optional: -d <division> -e <event num> -p <pages>')
             sys.exit()
         elif opt in ("-c", "--comp"):
             if arg not in ["open","regionals","games"]:
-                print 'invalid competition argument (open, regionals, games)'
+                print('invalid competition argument (open, regionals, games)')
                 sys.exit(2)
             comp = arg
         elif opt in ("-y", "--year"):
@@ -56,26 +57,26 @@ def main(argv):
             pages = int(arg)
         elif opt in ("-d", "--division"):
             if int(arg) not in range(1,20):
-                print "invalid division (1-19). 1: Men, 2: Women"
+                print("invalid division (1-19). 1: Men, 2: Women")
                 sys.exit(2)
             division = int(arg)
     if '-c' not in optList:
-        print '-c <competition> is a required option'
+        print('-c <competition> is a required option')
         sys.exit(2)
     if '-y' not in optList:
-        print '-y <year> is a required option'
+        print('-y <year> is a required option')
         sys.exit(2)
     if '-d' not in optList:
-        print '-d <division> is a required option (1-19) 1: Men, 2: Women'
+        print('-d <division> is a required option (1-19) 1: Men, 2: Women')
         sys.exit(2)
     if comp == "open" and int(year) < 2017 or int(year) > 2020:
-        print 'invalid year for the open (valid for 2017-2020)'
+        print('invalid year for the open (valid for 2017-2020)')
         sys.exit(2)
     if comp == "regionals" and int(year) != 2017:
-        print 'invalid year for regionals (2017 only)'
+        print('invalid year for regionals (2017 only)')
         sys.exit(2)
     if comp == "games" and int(year) < 2007 or int(year) > 2020:
-        print 'invalid year for the open (valid for 2007-2020)'
+        print('invalid year for the open (valid for 2007-2020)')
         sys.exit(2)
 
 
